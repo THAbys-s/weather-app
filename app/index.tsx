@@ -7,8 +7,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import WeatherIcon from "../components/Weather-Icon";
 
-// 🎨 Gradientes por clima (basado en texto de WeatherAPI)
 const gradients: any = {
   Sunny: ["#f6d365", "#fda085"],
   Clear: ["#f6d365", "#fda085"],
@@ -17,21 +17,6 @@ const gradients: any = {
   Rain: ["#4facfe", "#00f2fe"],
   Snow: ["#e0eafc", "#cfdef3"],
   Thunderstorm: ["#667db6", "#485563"],
-};
-
-// 🌤 Íconos simples
-const WeatherIcon = ({ type }: { type: string }) => {
-  const map: any = {
-    Sunny: "☀️",
-    Clear: "☀️",
-    Cloudy: "☁️",
-    Overcast: "☁️",
-    Rain: "🌧",
-    Snow: "❄️",
-    Thunderstorm: "⛈",
-  };
-
-  return <Text style={styles.icon}>{map[type] || "🌍"}</Text>;
 };
 
 const API_KEY = process.env.EXPO_PUBLIC_API_KEY;
@@ -47,35 +32,37 @@ export default function App() {
 
   const fetchWeather = async () => {
     try {
-      const res = await fetch(
+     const res = await fetch(
         `http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=Buenos Aires&days=3&aqi=no&alerts=no`
       );
 
       const data = await res.json();
 
-      // 🔥 Mapping limpio (SIN pisar props)
+     const isDay = data.current.is_day === 1;
+
       const formatted = [
-        mapDay(data.forecast.forecastday[0], "Ayer"),
-        mapDay(data.forecast.forecastday[1], "Hoy"),
-        mapDay(data.forecast.forecastday[2], "Mañana"),
+       mapDay(data.forecast.forecastday[0], "Ayer", isDay),
+       mapDay(data.forecast.forecastday[1], "Hoy", isDay),
+       mapDay(data.forecast.forecastday[2], "Mañana", isDay),
       ];
 
-      setWeather(formatted);
-    } catch (err) {
-      console.log("ERROR:", err);
-    } finally {
-      setLoading(false);
-    }
+     setWeather(formatted);
+   } catch (err) {
+     console.log("ERROR:", err);
+   } finally {
+     setLoading(false);
+   }
   };
 
-  const mapDay = (f: any, label: string) => ({
-    label,
-    temp: f.day.avgtemp_c,
-    min: f.day.mintemp_c,
-    max: f.day.maxtemp_c,
-    condition: f.day.condition.text,
-    humidity: f.day.avghumidity,
-    wind: f.day.maxwind_kph,
+  const mapDay = (f: any, label: string, isDay: boolean) => ({
+  label,
+  temp: f.day.avgtemp_c,
+  min: f.day.mintemp_c,
+  max: f.day.maxtemp_c,
+  condition: f.day.condition.text,
+  humidity: f.day.avghumidity,
+  wind: f.day.maxwind_kph,
+  isDay,
   });
 
   const goPrev = () => {
@@ -133,7 +120,10 @@ export default function App() {
       </View>
 
       {/* ICONO */}
-      <WeatherIcon type={baseCondition || current.condition} />
+      <WeatherIcon
+        condition={current.condition}
+        isDay={current.isDay}
+      />
 
       {/* TEMP */}
       <Text style={styles.temp}>
