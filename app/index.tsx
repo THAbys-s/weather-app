@@ -4,203 +4,241 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
-  Pressable,
-  ScrollView,
+  TouchableOpacity,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+
+// 🎨 Gradientes por clima (basado en texto de WeatherAPI)
+const gradients: any = {
+  Sunny: ["#f6d365", "#fda085"],
+  Clear: ["#f6d365", "#fda085"],
+  Cloudy: ["#89f7fe", "#66a6ff"],
+  Overcast: ["#89f7fe", "#66a6ff"],
+  Rain: ["#4facfe", "#00f2fe"],
+  Snow: ["#e0eafc", "#cfdef3"],
+  Thunderstorm: ["#667db6", "#485563"],
+};
+
+// 🌤 Íconos simples
+const WeatherIcon = ({ type }: { type: string }) => {
+  const map: any = {
+    Sunny: "☀️",
+    Clear: "☀️",
+    Cloudy: "☁️",
+    Overcast: "☁️",
+    Rain: "🌧",
+    Snow: "❄️",
+    Thunderstorm: "⛈",
+  };
+
+  return <Text style={styles.icon}>{map[type] || "🌍"}</Text>;
+};
 
 const API_KEY = process.env.EXPO_PUBLIC_API_KEY;
-const CITY = "Tokyo";
-console.log(process.env.EXPO_PUBLIC_API_KEY);
 
 export default function App() {
-  const [days, setDays] = useState<any[]>([]);
-  const [activeIndex, setActive] = useState(0);
-  const [cityName, setCityName] = useState("");
-  const [country, setCountry] = useState("");
+  const [weather, setWeather] = useState<any[]>([]);
+  const [index, setIndex] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!API_KEY) {
-      setError("Falta API KEY en .env");
-      setLoading(false);
-      return;
-    }
-
-    const url = `https://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=${CITY}&days=7`;
-
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        setCityName(data.location.name);
-        setCountry(data.location.country);
-        setDays(data.forecast.forecastday);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+    fetchWeather();
   }, []);
 
-  const prev = () =>
-    setActive((i) => (i - 1 + days.length) % days.length);
+  const fetchWeather = async () => {
+    try {
+      const res = await fetch(
+        `http://api.weatherapi.com/v1/forecast.json?key=${API_KEY}&q=Buenos Aires&days=3&aqi=no&alerts=no`
+      );
 
-  const next = () =>
-    setActive((i) => (i + 1) % days.length);
+      const data = await res.json();
 
-  // ── Loading ──
+      // 🔥 Mapping limpio (SIN pisar props)
+      const formatted = [
+        mapDay(data.forecast.forecastday[0], "Ayer"),
+        mapDay(data.forecast.forecastday[1], "Hoy"),
+        mapDay(data.forecast.forecastday[2], "Mañana"),
+      ];
+
+      setWeather(formatted);
+    } catch (err) {
+      console.log("ERROR:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const mapDay = (f: any, label: string) => ({
+    label,
+    temp: f.day.avgtemp_c,
+    min: f.day.mintemp_c,
+    max: f.day.maxtemp_c,
+    condition: f.day.condition.text,
+    humidity: f.day.avghumidity,
+    wind: f.day.maxwind_kph,
+  });
+
+  const goPrev = () => {
+    if (index > 0) setIndex(index - 1);
+  };
+
+  const goNext = () => {
+    if (index < 2) setIndex(index + 1);
+  };
+
   if (loading) {
     return (
-      <View style={styles.center}>
+      <View style={styles.loader}>
         <ActivityIndicator size="large" />
-        <Text style={styles.info}>Cargando...</Text>
       </View>
     );
   }
 
-  // ── Error ──
-  if (error) {
+  if (!weather.length) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.error}>Error:</Text>
-        <Text style={styles.info}>{error}</Text>
+      <View style={styles.loader}>
+        <Text>Error cargando datos</Text>
       </View>
     );
   }
 
-  const d = days[activeIndex];
+  const current = weather[index];
+
+  // Normalizamos condición (WeatherAPI tira textos tipo "Light rain")
+  const baseCondition = Object.keys(gradients).find((key) =>
+    current.condition.includes(key)
+  );
 
   return (
-    <View style={styles.container}>
-      {/* Ciudad */}
-      <Text style={styles.country}>{country}</Text>
-      <Text style={styles.city}>{cityName}</Text>
+    <LinearGradient
+      colors={gradients[baseCondition!] || ["#89f7fe", "#66a6ff"]}
+      style={styles.container}
+    >
+      {/* CIUDAD */}
+      <Text style={styles.city}>BUENOS AIRES</Text>
 
-      {/* Navegación */}
+      {/* NAV */}
       <View style={styles.nav}>
-        <Pressable onPress={prev}>
-          <Text style={styles.btn}>{"<"}</Text>
-        </Pressable>
+        <TouchableOpacity onPress={goPrev}>
+          <Text style={styles.navButton}>◀</Text>
+        </TouchableOpacity>
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {days.map((day, i) => (
-            <Pressable key={i} onPress={() => setActive(i)}>
-              <Text
-                style={[
-                  styles.day,
-                  i === activeIndex && styles.activeDay,
-                ]}
-              >
-                {day.date}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
+        <Text style={styles.day}>
+          {current.label.toUpperCase()}
+        </Text>
 
-        <Pressable onPress={next}>
-          <Text style={styles.btn}>{">"}</Text>
-        </Pressable>
+        <TouchableOpacity onPress={goNext}>
+          <Text style={styles.navButton}>▶</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* Datos principales */}
+      {/* ICONO */}
+      <WeatherIcon type={baseCondition || current.condition} />
+
+      {/* TEMP */}
       <Text style={styles.temp}>
-        {Math.round(d.day.avgtemp_c)}°
+        {Math.round(current.temp)}°
       </Text>
 
-      <Text style={styles.condition}>
-        {d.day.condition.text}
+      {/* MIN MAX */}
+      <Text style={styles.minMax}>
+        Min: {Math.round(current.min)}°   Max:{" "}
+        {Math.round(current.max)}°
       </Text>
 
-      {/* Min / Max */}
-      <View style={styles.row}>
-        <Text style={styles.min}>Min: {d.day.mintemp_c}°</Text>
-        <Text style={styles.max}>Max: {d.day.maxtemp_c}°</Text>
-      </View>
+      {/* MÉTRICAS */}
+      <View style={styles.metrics}>
+        <View style={styles.metricBox}>
+          <Text style={styles.metricIcon}>💧</Text>
+          <Text style={styles.metricValue}>
+            {current.humidity}%
+          </Text>
+        </View>
 
-      {/* Métricas */}
-      <View style={styles.row}>
-        <Text style={styles.metric}>
-          💧 {d.day.avghumidity}%
-        </Text>
-        <Text style={styles.metric}>
-          🌬 {d.day.maxwind_kph} km/h
-        </Text>
+        <View style={styles.metricBox}>
+          <Text style={styles.metricIcon}>🌬</Text>
+          <Text style={styles.metricValue}>
+            {current.wind} km/h
+          </Text>
+        </View>
       </View>
-    </View>
+    </LinearGradient>
   );
 }
 
+// 🎨 ESTILOS
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0B1120",
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#0B1120",
-  },
+
   city: {
-    fontSize: 32,
-    color: "#E8F2FF",
+    fontSize: 28,
     fontWeight: "bold",
+    color: "white",
+    marginBottom: 10,
   },
-  country: {
-    color: "#7BA3CC",
-    marginBottom: 5,
-  },
+
   nav: {
     flexDirection: "row",
     alignItems: "center",
-    marginVertical: 20,
-  },
-  btn: {
-    fontSize: 20,
-    padding: 10,
-    color: "#7BA3CC",
-  },
-  day: {
-    color: "#33536A",
-    marginHorizontal: 6,
-  },
-  activeDay: {
-    color: "#E8F2FF",
-    fontWeight: "bold",
-  },
-  temp: {
-    fontSize: 64,
-    color: "#E8F2FF",
-    marginVertical: 10,
-  },
-  condition: {
-    color: "#7BA3CC",
     marginBottom: 20,
   },
-  row: {
-    flexDirection: "row",
-    gap: 20,
-    marginTop: 10,
+
+  navButton: {
+    fontSize: 30,
+    color: "white",
+    marginHorizontal: 20,
   },
-  min: {
-    color: "#B0CCDD",
+
+  day: {
+    fontSize: 22,
+    color: "white",
+    fontWeight: "600",
   },
-  max: {
-    color: "#B0CCDD",
+
+  icon: {
+    fontSize: 80,
+    marginVertical: 20,
   },
-  metric: {
-    color: "#7BA3CC",
+
+  temp: {
+    fontSize: 90,
+    color: "white",
+    fontWeight: "200",
   },
-  info: {
-    color: "#7BA3CC",
-    marginTop: 10,
-  },
-  error: {
-    color: "red",
+
+  minMax: {
     fontSize: 18,
+    color: "white",
+    marginBottom: 30,
+  },
+
+  metrics: {
+    flexDirection: "row",
+    width: "100%",
+  },
+
+  metricBox: {
+    flex: 1,
+    alignItems: "center",
+  },
+
+  metricIcon: {
+    fontSize: 24,
+  },
+
+  metricValue: {
+    color: "white",
+    marginTop: 5,
+  },
+
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
