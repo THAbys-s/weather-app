@@ -131,8 +131,8 @@ export default function ContenedorDeClima() {
         </TarjetaDeMetrica>
 
         <TarjetaDeMetrica
-          colores={["#B2243E", "#B2243E"]}
-          colorDelPie="#8A1C31"
+          colores={["#66D9FE", "#48BBFA"]}
+          colorDelPie="#3F9DF1"
           etiqueta="Humidity"
           valor={climaActual.humidity}
           unidad="%"
@@ -141,8 +141,8 @@ export default function ContenedorDeClima() {
         </TarjetaDeMetrica>
 
         <TarjetaDeMetrica
-          colores={["#B2243E", "#B2243E"]}
-          colorDelPie="#8A1C31"
+          colores={["#66D9FE", "#48BBFA"]}
+          colorDelPie="#3F9DF1"
           etiqueta="Pressure"
           valor={Math.round(climaActual.pressure)}
           unidad="hpa"
@@ -204,14 +204,22 @@ const estilos = StyleSheet.create({
     width: (width - 60) / 3,
     height: 140,
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "white",
-    overflow: "hidden",
+    padding: 3,
+    justifyContent: "center",
+    alignItems: "center",
     elevation: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
+  },
+  bordeDeLaTarjeta: {
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.4)",
+    borderRadius: 13,
+    flex: 1,
+    width: "100%",
+    overflow: "hidden",
   },
   cuerpoDelaTarjeta: {
     flex: 3,
