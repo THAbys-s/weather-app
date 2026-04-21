@@ -1,5 +1,5 @@
-import { Text, TextClassContext } from '@/components/ui/text';
-import { cn } from '@/lib/utils';
+import { Texto, TextClassContext } from '@/src/componentes/contenidos/Texto';
+import { cn } from '@/src/lib/utilidades';
 import { View } from 'react-native';
 
 function Card({ className, ...props }: React.ComponentProps<typeof View>) {
@@ -23,9 +23,9 @@ function CardHeader({ className, ...props }: React.ComponentProps<typeof View>) 
 function CardTitle({
   className,
   ...props
-}: React.ComponentProps<typeof Text>) {
+}: React.ComponentProps<typeof Texto>) {
   return (
-    <Text
+    <Texto
       role="heading"
       aria-level={3}
       className={cn('font-semibold leading-none', className)}
@@ -37,8 +37,8 @@ function CardTitle({
 function CardDescription({
   className,
   ...props
-}: React.ComponentProps<typeof Text>) {
-  return <Text className={cn('text-muted-foreground text-sm', className)} {...props} />;
+}: React.ComponentProps<typeof Texto>) {
+  return <Texto className={cn('text-muted-foreground text-sm', className)} {...props} />;
 }
 
 function CardContent({ className, ...props }: React.ComponentProps<typeof View>) {

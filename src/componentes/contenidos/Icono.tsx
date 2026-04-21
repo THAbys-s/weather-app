@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/src/lib/utilidades';
 import type { LucideIcon, LucideProps } from 'lucide-react-native';
 import { cssInterop } from 'nativewind';
 
@@ -30,9 +30,9 @@ cssInterop(IconImpl, {
  * @example
  * ```tsx
  * import { ArrowRight } from 'lucide-react-native';
- * import { Icon } from '@/registry/components/ui/icon';
+ * import { Icono } from '@/src/componentes/contenidos/Icono';
  *
- * <Icon as={ArrowRight} className="text-red-500" size={16} />
+ * <Icono as={ArrowRight} className="text-red-500" size={16} />
  * ```
  *
  * @param {LucideIcon} as - The Lucide icon component to render.
