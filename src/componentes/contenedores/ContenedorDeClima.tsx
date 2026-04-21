@@ -4,25 +4,12 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
-  Dimensions,
 } from "react-native";
 import { Button } from "@/src/componentes/contenidos/Boton";
 import { LinearGradient } from "expo-linear-gradient";
 import IconoDelClima from "@/src/componentes/contenidos/IconoDelClima";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { useClima } from "@/src/hooks/useClima";
-
-const { width } = Dimensions.get("window");
-
-const gradientes: Record<string, [string, string]> = {
-  Sunny: ["#f6d365", "#fda085"],
-  Clear: ["#f6d365", "#fda085"],
-  Cloudy: ["#89f7fe", "#66a6ff"],
-  Overcast: ["#89f7fe", "#66a6ff"],
-  Rain: ["#4facfe", "#00f2fe"],
-  Snow: ["#e0eafc", "#cfdef3"],
-  Thunderstorm: ["#667db6", "#485563"],
-};
 
 const TarjetaDeMetrica = ({
   colores,
@@ -63,6 +50,7 @@ const TarjetaDeMetrica = ({
 );
 
 export default function ContenedorDeClima() {
+  
   const {
     climaActual,
     cargando,
@@ -194,25 +182,27 @@ const estilos = StyleSheet.create({
   },
 
   // Estilos de las tarjetas
-  filaDeMetricas: {
+    filaDeMetricas: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    gap: 10,
     width: "100%",
-    paddingHorizontal: 5,
+    paddingHorizontal: 10,
+    justifyContent: "space-between",
   },
+  
   tarjeta: {
-    width: (width - 60) / 3,
-    height: 140,
+    flex: 1,
+    aspectRatio: 2 / 3,
+    maxWidth: 150, // no exceda este ancho
     borderRadius: 16,
-    padding: 3,
-    justifyContent: "center",
-    alignItems: "center",
+    overflow: "hidden",
     elevation: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
+
   bordeDeLaTarjeta: {
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.4)",
