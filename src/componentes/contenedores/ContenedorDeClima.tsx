@@ -39,20 +39,27 @@ const TarjetaDeMetrica = ({
   unidad: string;
   children: React.ReactNode;
 }) => (
-  <View style={estilos.tarjeta}>
-    <LinearGradient colors={colores} style={estilos.cuerpoDelaTarjeta}>
-      <View style={estilos.placeholderDelIcono}>
-        {children}
+  <LinearGradient
+    colors={colores}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+    style={estilos.tarjeta}
+  >
+    <View style={estilos.bordeDeLaTarjeta}>
+      <View style={estilos.cuerpoDelaTarjeta}>
+        <View style={estilos.placeholderDelIcono}>
+          {children}
+        </View>
+        <View style={estilos.filaDelValor}>
+          <Text style={estilos.valorDeLaTarjeta}>{valor}</Text>
+          <Text style={estilos.unidadDeLaTarjeta}>{unidad}</Text>
+        </View>
       </View>
-      <View style={estilos.filaDelValor}>
-        <Text style={estilos.valorDeLaTarjeta}>{valor}</Text>
-        <Text style={estilos.unidadDeLaTarjeta}>{unidad}</Text>
+      <View style={[estilos.pieDeLaTarjeta, { backgroundColor: colorDelPie }]}>
+        <Text style={estilos.etiquetaDeLaTarjeta}>{etiqueta}</Text>
       </View>
-    </LinearGradient>
-    <View style={[estilos.pieDeLaTarjeta, { backgroundColor: colorDelPie }]}>
-      <Text style={estilos.etiquetaDeLaTarjeta}>{etiqueta}</Text>
     </View>
-  </View>
+  </LinearGradient>
 );
 
 export default function ContenedorDeClima() {
@@ -80,26 +87,20 @@ export default function ContenedorDeClima() {
     );
   }
 
-  const condicionBase = Object.keys(gradientes).find((clave) =>
-    climaActual.condition.includes(clave)
-  ) as keyof typeof gradientes;
-
-  const gradienteActual = gradientes[condicionBase] || ["#89f7fe", "#66a6ff"];
-
   return (
     <LinearGradient
-      colors={gradienteActual}
+      colors={["#FFFF", "#FFF"]}
       style={estilos.contenedor}
     >
       <Text style={estilos.ciudad}>BUENOS AIRES</Text>
 
       <View style={estilos.navegacion}>
         <Button variant="ghost" size="icon" onPress={irAlAnterior}>
-          <ChevronLeft color="white" size={28} />
+          <ChevronLeft color="#000000" size={28} />
         </Button>
         <Text style={estilos.dia}>{climaActual.label.toUpperCase()}</Text>
         <Button variant="ghost" size="icon" onPress={irAlSiguiente}>
-          <ChevronRight color="white" size={28} />
+          <ChevronRight color="#000000" size={28} />
         </Button>
       </View>
 
@@ -120,8 +121,8 @@ export default function ContenedorDeClima() {
       {/* --- SECCIÓN DE TARJETAS DE MÉTRICAS --- */}
       <View style={estilos.filaDeMetricas}>
         <TarjetaDeMetrica
-          colores={["#D62B4A", "#7A1024"]}
-          colorDelPie="#5A0C1B"
+          colores={["#66D9FE", "#48BBFA"]}
+          colorDelPie="#3F9DF1"
           etiqueta="Wind"
           valor={Math.round(climaActual.wind)}
           unidad="km/h"
@@ -130,8 +131,8 @@ export default function ContenedorDeClima() {
         </TarjetaDeMetrica>
 
         <TarjetaDeMetrica
-          colores={["#C73E8F", "#5E1B44"]}
-          colorDelPie="#4A1536"
+          colores={["#B2243E", "#B2243E"]}
+          colorDelPie="#8A1C31"
           etiqueta="Humidity"
           valor={climaActual.humidity}
           unidad="%"
@@ -140,8 +141,8 @@ export default function ContenedorDeClima() {
         </TarjetaDeMetrica>
 
         <TarjetaDeMetrica
-          colores={["#9B5B8A", "#2E1529"]}
-          colorDelPie="#1F0E1B"
+          colores={["#B2243E", "#B2243E"]}
+          colorDelPie="#8A1C31"
           etiqueta="Pressure"
           valor={Math.round(climaActual.pressure)}
           unidad="hpa"
@@ -163,7 +164,7 @@ const estilos = StyleSheet.create({
   ciudad: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "white",
+    color: "#000000",
     marginBottom: 10,
   },
   navegacion: {
@@ -173,17 +174,17 @@ const estilos = StyleSheet.create({
   },
   dia: {
     fontSize: 22,
-    color: "white",
+    color: "#000000",
     fontWeight: "600",
   },
   temperatura: {
     fontSize: 90,
-    color: "white",
+    color: "#000000",
     fontWeight: "200",
   },
   minMax: {
     fontSize: 18,
-    color: "white",
+    color: "#000000",
     marginBottom: 30,
   },
   cargador: {
@@ -203,6 +204,8 @@ const estilos = StyleSheet.create({
     width: (width - 60) / 3,
     height: 140,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "white",
     overflow: "hidden",
     elevation: 4,
     shadowColor: "#000",
