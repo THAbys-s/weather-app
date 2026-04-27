@@ -4,12 +4,17 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
+  ImageBackground,
 } from "react-native";
-import { Button } from "@/src/componentes/contenidos/Boton";
-import { LinearGradient } from "expo-linear-gradient";
-import IconoDelClima from "@/src/componentes/contenidos/IconoDelClima";
-import { ChevronLeft, ChevronRight } from "lucide-react-native";
+import BotonDeNavegacion from "@/src/componentes/contenidos/BotonNavegacion";
 import { useClima } from "@/src/hooks/useClima";
+import { useLocation } from "@/src/hooks/useLocation";
+import IconoDelClima from "@/src/componentes/contenidos/IconoDelClima";
+import WindIcon from "@/assets/icons/metrics_wind.svg";
+import HumidityIcon from "@/assets/icons/metrics_humidity.svg";
+import PressureIcon from "@/assets/icons/metrics_pressure.svg";
+
+import { LinearGradient } from "expo-linear-gradient";
 
 const TarjetaDeMetrica = ({
   colores,
@@ -17,14 +22,14 @@ const TarjetaDeMetrica = ({
   etiqueta,
   valor,
   unidad,
-  children,
+  icon,
 }: {
   colores: [string, string];
   colorDelPie: string;
   etiqueta: string;
   valor: number | string;
   unidad: string;
-  children: React.ReactNode;
+  icon?: React.ReactNode;
 }) => (
   <LinearGradient
     colors={colores}
@@ -34,14 +39,18 @@ const TarjetaDeMetrica = ({
   >
     <View style={estilos.bordeDeLaTarjeta}>
       <View style={estilos.cuerpoDelaTarjeta}>
-        <View style={estilos.placeholderDelIcono}>
-          {children}
-        </View>
+
         <View style={estilos.filaDelValor}>
           <Text style={estilos.valorDeLaTarjeta}>{valor}</Text>
           <Text style={estilos.unidadDeLaTarjeta}>{unidad}</Text>
         </View>
+
+        <View style={estilos.placeholderDelIcono}>
+          {icon}
+        </View>
+
       </View>
+
       <View style={[estilos.pieDeLaTarjeta, { backgroundColor: colorDelPie }]}>
         <Text style={estilos.etiquetaDeLaTarjeta}>{etiqueta}</Text>
       </View>
@@ -50,16 +59,18 @@ const TarjetaDeMetrica = ({
 );
 
 export default function ContenedorDeClima() {
-  
+  const { location } = useLocation();
   const {
     climaActual,
     cargando,
     error,
     irAlAnterior,
     irAlSiguiente,
-  } = useClima();
+    indiceActual,
+    pronostico,
+  } = useClima(location.status === "granted" ? location.coords : undefined);
 
-  if (cargando) {
+  if (cargando || location.status === "loading") {
     return (
       <View style={estilos.cargador}>
         <ActivityIndicator size="large" />
@@ -75,70 +86,56 @@ export default function ContenedorDeClima() {
     );
   }
 
+  const total = pronostico.length;
+
+  const fechaFormateada = climaActual.date.toLocaleDateString("es-ES", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+
   return (
-    <LinearGradient
-      colors={["#FFFF", "#FFF"]}
-      style={estilos.contenedor}
-    >
-      <Text style={estilos.ciudad}>BUENOS AIRES</Text>
-
-      <View style={estilos.navegacion}>
-        <Button variant="ghost" size="icon" onPress={irAlAnterior}>
-          <ChevronLeft color="#000000" size={28} />
-        </Button>
-        <Text style={estilos.dia}>{climaActual.label.toUpperCase()}</Text>
-        <Button variant="ghost" size="icon" onPress={irAlSiguiente}>
-          <ChevronRight color="#000000" size={28} />
-        </Button>
+      <View style={estilos.contenedor}>
+      <Text style={estilos.ciudad}>{location.status === "granted" ? location.city : "Cargando..."}</Text>   
+        <BotonDeNavegacion
+          onPrev={irAlAnterior}
+          current={fechaFormateada}
+          onNext={irAlSiguiente}
+          canGoPrev={indiceActual > 0}
+          canGoNext={indiceActual < total - 1}
+        />
+        <IconoDelClima condition={climaActual.condition} isDay={climaActual.isDay} />
+        <Text style={estilos.temperatura}>{Math.round(climaActual.temp)}°</Text>
+        <Text style={estilos.minMax}>
+          Min: {Math.round(climaActual.min)}°   Max: {Math.round(climaActual.max)}°
+        </Text>
+        <View style={estilos.filaDeMetricas}>
+          <TarjetaDeMetrica
+            colores={["#66D9FE", "#48BBFA"]}
+            colorDelPie="#3F9DF1"
+            etiqueta="Wind"
+            valor={Math.round(climaActual.wind)}
+            unidad="km/h"
+            icon={<WindIcon width={28} height={28} />}
+          />
+          <TarjetaDeMetrica
+            colores={["#66D9FE", "#48BBFA"]}
+            colorDelPie="#3F9DF1"
+            etiqueta="Humidity"
+            valor={climaActual.humidity}
+            unidad="%"
+            icon={<HumidityIcon width={28} height={28} />}
+          />
+          <TarjetaDeMetrica
+            colores={["#66D9FE", "#48BBFA"]}
+            colorDelPie="#3F9DF1"
+            etiqueta="Pressure"
+            valor={Math.round(climaActual.pressure)}
+            unidad="hpa"
+            icon={<PressureIcon width={28} height={28} />}
+          />
+        </View>
       </View>
-
-      <IconoDelClima
-        condition={climaActual.condition}
-        isDay={climaActual.isDay}
-      />
-
-      <Text style={estilos.temperatura}>
-        {Math.round(climaActual.temp)}°
-      </Text>
-
-      <Text style={estilos.minMax}>
-        Min: {Math.round(climaActual.min)}°   Max:{" "}
-        {Math.round(climaActual.max)}°
-      </Text>
-
-      {/* --- SECCIÓN DE TARJETAS DE MÉTRICAS --- */}
-      <View style={estilos.filaDeMetricas}>
-        <TarjetaDeMetrica
-          colores={["#66D9FE", "#48BBFA"]}
-          colorDelPie="#3F9DF1"
-          etiqueta="Wind"
-          valor={Math.round(climaActual.wind)}
-          unidad="km/h"
-        >
-          {/* SVG DE VIENTO */}
-        </TarjetaDeMetrica>
-
-        <TarjetaDeMetrica
-          colores={["#66D9FE", "#48BBFA"]}
-          colorDelPie="#3F9DF1"
-          etiqueta="Humidity"
-          valor={climaActual.humidity}
-          unidad="%"
-        >
-          {/* SVG DE HUMEDAD */}
-        </TarjetaDeMetrica>
-
-        <TarjetaDeMetrica
-          colores={["#66D9FE", "#48BBFA"]}
-          colorDelPie="#3F9DF1"
-          etiqueta="Pressure"
-          valor={Math.round(climaActual.pressure)}
-          unidad="hpa"
-        >
-          {/* SVG DE PRESIÓN */}
-        </TarjetaDeMetrica>
-      </View>
-    </LinearGradient>
   );
 }
 
@@ -150,29 +147,19 @@ const estilos = StyleSheet.create({
     padding: 20,
   },
   ciudad: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#000000",
+    color: "#000",
     marginBottom: 10,
-  },
-  navegacion: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  dia: {
-    fontSize: 22,
-    color: "#000000",
-    fontWeight: "600",
   },
   temperatura: {
     fontSize: 90,
-    color: "#000000",
+    color: "#000",
     fontWeight: "200",
   },
   minMax: {
     fontSize: 18,
-    color: "#000000",
+    color: "#000",
     marginBottom: 30,
   },
   cargador: {
@@ -181,26 +168,24 @@ const estilos = StyleSheet.create({
     alignItems: "center",
   },
 
-  // Estilos de las tarjetas
-    filaDeMetricas: {
+  filaDeMetricas: {
     flexDirection: "row",
-    gap: 10,
+    gap: 12,
     width: "100%",
-    paddingHorizontal: 10,
-    justifyContent: "space-between",
+    paddingHorizontal: 5,
+    marginTop: 20,
   },
-  
+
   tarjeta: {
     flex: 1,
-    aspectRatio: 2 / 3,
-    maxWidth: 150, // no exceda este ancho
-    borderRadius: 16,
+    height: 140,
+    borderRadius: 20,
     overflow: "hidden",
-    elevation: 4,
+    elevation: 6,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
   },
 
   bordeDeLaTarjeta: {
@@ -211,37 +196,44 @@ const estilos = StyleSheet.create({
     width: "100%",
     overflow: "hidden",
   },
+
   cuerpoDelaTarjeta: {
     flex: 3,
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 8,
   },
+
   placeholderDelIcono: {
     height: 40,
     justifyContent: "center",
-    marginBottom: 4,
+    marginTop: 6,
   },
+
   filaDelValor: {
     flexDirection: "row",
     alignItems: "baseline",
   },
+
   valorDeLaTarjeta: {
     color: "white",
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "bold",
   },
+
   unidadDeLaTarjeta: {
     color: "white",
-    fontSize: 10,
-    marginLeft: 2,
+    fontSize: 12,
+    marginLeft: 4,
     opacity: 0.8,
   },
+
   pieDeLaTarjeta: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
+
   etiquetaDeLaTarjeta: {
     color: "white",
     fontSize: 9,
@@ -250,3 +242,4 @@ const estilos = StyleSheet.create({
     letterSpacing: 0.5,
   },
 });
+

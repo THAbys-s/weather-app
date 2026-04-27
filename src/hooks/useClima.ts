@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { obtenerPronostico, DatosDelDia } from "@/src/servicios/apiDelClima";
 
-export const useClima = () => {
+export const useClima = (coords?: { latitude: number; longitude: number }) => {
   const [pronostico, setPronostico] = useState<DatosDelDia[]>([]);
   const [indiceActual, setIndiceActual] = useState(1);
   const [cargando, setCargando] = useState(true);
@@ -9,14 +9,14 @@ export const useClima = () => {
 
   useEffect(() => {
     cargarDatos();
-  }, []);
+  }, [coords?.latitude, coords?.longitude]);
 
   const cargarDatos = async () => {
     try {
       setCargando(true);
       setError(null);
-      const datos = await obtenerPronostico();
-      setPronostico(datos);
+      const resultado = await obtenerPronostico(coords);
+      setPronostico(resultado.datos);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error desconocido");
       console.error("Error en useClima:", err);
@@ -32,7 +32,7 @@ export const useClima = () => {
   };
 
   const irAlSiguiente = () => {
-    if (indiceActual < 2) {
+    if (indiceActual < pronostico.length - 1) {
       setIndiceActual(indiceActual + 1);
     }
   };
