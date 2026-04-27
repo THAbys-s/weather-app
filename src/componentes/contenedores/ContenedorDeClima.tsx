@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
-  ImageBackground,
 } from "react-native";
 import BotonDeNavegacion from "@/src/componentes/contenidos/BotonNavegacion";
 import { useClima } from "@/src/hooks/useClima";
