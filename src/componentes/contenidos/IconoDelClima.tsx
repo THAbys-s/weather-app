@@ -22,30 +22,32 @@ export default function IconoDelClima({
   const pickIcon = () => {
     if (condition.includes("Sunny") || condition.includes("Clear"))
       return isDay ? Sunny : Clear;
-
     if (condition.includes("Cloud"))
       return isDay ? CloudySun : Cloudy;
-
     if (condition.includes("Rain") || condition.includes("Drizzle"))
       return isDay ? RainSun : Rain;
-
     if (condition.includes("Snow"))
       return isDay ? SnowSun : Snow;
-
     if (condition.includes("Thunder"))
       return isDay ? ThunderSun : Thunder;
-
     if (
       condition.includes("Mist") ||
       condition.includes("Fog") ||
       condition.includes("Haze")
     )
       return Fog;
-
     return Sunny;
   };
 
   const Icon = pickIcon();
+  const testId = `icon-weather-${condition.toLowerCase().replace(/\s+/g, "-")}`;
 
-  return <Icon width={size} height={size} />;
+  return (
+    <Icon
+      width={size}
+      height={size}
+      testID={testId}
+      accessibilityRole="image"
+    />
+  );
 }

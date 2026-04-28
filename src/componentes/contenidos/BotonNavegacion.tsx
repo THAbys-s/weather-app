@@ -1,7 +1,8 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { estilosBoton as estilos } from "@/src/constantes/estilos";
 
 type Props = {
-  current: string; 
+  current: string;
   onPrev: () => void;
   onNext: () => void;
   canGoPrev: boolean;
@@ -16,49 +17,22 @@ export default function BotonDeNavegacion({
   canGoNext,
 }: Props) {
   return (
-    <View style={styles.container}>
+    <View testID="navigation-container" style={estilos.container}>
       {canGoPrev && (
-        <TouchableOpacity style={styles.sideButton} onPress={onPrev}>
-          <Text style={styles.arrow}>{"<"}</Text>
+        <TouchableOpacity testID="button-prev-day" style={estilos.sideButton} onPress={onPrev}>
+          <Text style={estilos.arrow}>{"<"}</Text>
         </TouchableOpacity>
       )}
-      <View style={styles.currentContainer}>
-        <Text style={styles.currentLabel}>{current}</Text>
+      <View style={estilos.currentContainer}>
+        <Text testID="navigation-current-day" style={estilos.currentLabel}>
+          {current}
+        </Text>
       </View>
       {canGoNext && (
-        <TouchableOpacity style={styles.sideButton} onPress={onNext}>
-          <Text style={styles.arrow}>{">"}</Text>
+        <TouchableOpacity testID="button-next-day" style={estilos.sideButton} onPress={onNext}>
+          <Text style={estilos.arrow}>{">"}</Text>
         </TouchableOpacity>
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginBottom: 20,
-  },
-  sideButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  arrow: {
-    fontSize: 18,
-    color: '#333',
-  },
-  currentContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#ffffffaa',
-    borderRadius: 10,
-  },
-  currentLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111',
-  },
-});
