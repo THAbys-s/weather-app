@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { obtenerPronostico, DatosDelDia } from "@/src/servicios/apiDelClima";
+import { obtenerPronostico, DatosDelDia } from "../servicios/apiDelClima";
 
 export const useClima = (coords?: { latitude: number; longitude: number }) => {
   const [pronostico, setPronostico] = useState<DatosDelDia[]>([]);

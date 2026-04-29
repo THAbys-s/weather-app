@@ -1,14 +1,14 @@
 import React from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import BotonDeNavegacion from "@/src/componentes/contenidos/BotonNavegacion";
-import IconoDelClima from "@/src/componentes/contenidos/IconoDelClima";
-import { useClima } from "@/src/hooks/useClima";
-import { useLocation } from "@/src/hooks/useLocation";
-import { estilosContenedor as estilos } from "@/src/constantes/estilos";
-import WindIcon from "@/assets/icons/metrics_wind.svg";
-import HumidityIcon from "@/assets/icons/metrics_humidity.svg";
-import PressureIcon from "@/assets/icons/metrics_pressure.svg";
+import BotonDeNavegacion from "../contenidos/BotonNavegacion";
+import IconoDelClima from "../contenidos/IconoDelClima";
+import { useClima } from "../../hooks/useClima";
+import { useLocation } from "../../hooks/useLocation";
+import { estilosContenedor as estilos } from "../../constantes/estilos";
+import WindIcon from "../../../assets/icons/metrics_wind.svg";
+import HumidityIcon from "../../../assets/icons/metrics_humidity.svg";
+import PressureIcon from "../../../assets/icons/metrics_pressure.svg";
 
 const TarjetaDeMetrica = ({
   colores,

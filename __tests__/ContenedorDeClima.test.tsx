@@ -1,13 +1,13 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
-import ContenedorDeClima from "@/src/componentes/ContenedorDeClima";
+import ContenedorDeClima from "../src/componentes/contenedores/ContenedorDeClima";
 
 // mocks de hooks
-jest.mock("@/src/hooks/useClima");
-jest.mock("@/src/hooks/useLocation");
+jest.mock("../src/hooks/useClima");
+jest.mock("../src/hooks/useLocation");
 
-import { useClima } from "@/src/hooks/useClima";
-import { useLocation } from "@/src/hooks/useLocation";
+import { useClima } from "../src/hooks/useClima";
+import { useLocation } from "../src/hooks/useLocation";
 
 const mockUseClima = useClima as jest.Mock;
 const mockUseLocation = useLocation as jest.Mock;
@@ -82,6 +82,14 @@ describe("ContenedorDeClima", () => {
     fireEvent.press(getByTestId("button-next-day"));
 
     expect(getByTestId("navigation-current-day")).toBeTruthy();
+  });
+
+  test("mantiene testID de navegación incluso cuando el botón anterior está deshabilitado", () => {
+    const { getByTestId } = render(<ContenedorDeClima />);
+
+    const prevButton = getByTestId("button-prev-day");
+    expect(prevButton).toBeTruthy();
+    expect(prevButton.props.accessibilityState.disabled).toBe(true);
   });
 
   test("expone todos los testID obligatorios", () => {

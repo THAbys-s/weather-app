@@ -1,5 +1,5 @@
 import { render, fireEvent } from "@testing-library/react-native";
-import BotonDeNavegacion from "@/src/componentes/contenidos/BotonNavegacion";
+import BotonDeNavegacion from "../src/componentes/contenidos/BotonNavegacion";
 
 describe("BotonDeNavegacion", () => {
   test("renderiza correctamente", () => {

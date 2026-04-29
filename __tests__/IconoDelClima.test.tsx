@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "@testing-library/react-native";
-import IconoDelClima from "@/src/componentes/contenidos/IconoDelClima";
+import IconoDelClima from "../src/componentes/contenidos/IconoDelClima";
 
 describe("IconoDelClima", () => {
   test("renderiza icono con testID dinámico", () => {

@@ -56,6 +56,10 @@
   "private": true,
   "jest": {
     "preset": "jest-expo",
-    "transformIgnorePatterns": []
+    "transformIgnorePatterns": [],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1",
+      "\\.svg$": "<rootDir>/__mocks__/svgMock.js"
+    }
   }
 }
