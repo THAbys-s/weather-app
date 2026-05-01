@@ -9,6 +9,7 @@ import { estilosContenedor as estilos } from "../../constantes/estilos";
 import WindIcon from "../../../assets/icons/metrics_wind.svg";
 import HumidityIcon from "../../../assets/icons/metrics_humidity.svg";
 import PressureIcon from "../../../assets/icons/metrics_pressure.svg";
+const API_KEY = process.env.EXPO_PUBLIC_API_KEY;
 
 const TarjetaDeMetrica = ({
   colores,
